@@ -33,7 +33,9 @@ jittor_cache/
 # Local reference PDFs / reference PyTorch repo / local deps
 flow matching paper.pdf
 /_ref_flow_matching/
+/flow_matching-main/
 /.pydeps/
+/proposal/
 *.aux
 *.bbl
 *.blg

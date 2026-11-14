@@ -1,0 +1,31 @@
+# Lipman et al. (2023) Figure 4: 2D Checkerboard reproduction configuration
+seed: 42
+methods:
+  - sm_dif
+  - fm_dif
+  - fm_ot
+
+model:
+  input_dim: 2
+  hidden_dim: 512
+  num_layers: 5
+
+path:
+  sigma_min: 0.0
+  beta_min: 0.1
+  beta_max: 20.0
+  time_eps: 1.0e-5
+
+train:
+  iterations: 20000
+  batch_size: 4096
+  lr: 1.0e-3
+  log_every: 1000
+
+eval:
+  num_samples: 50000
+  trajectory_panels: 9
+  trajectory_step_size: 0.02
+  low_nfe_list: [4, 8, 10, 20]
+  hist_bins: 220
+  plot_range: 5.0

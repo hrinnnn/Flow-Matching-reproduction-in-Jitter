@@ -1,1 +1,5 @@
-"""Datasets and data loaders (2D Checkerboard, CIFAR-10, ImageNet-32)."""
+"""Datasets and synthetic generators."""
+
+from jfm.datasets.checkerboard import sample_checkerboard
+
+__all__ = ["sample_checkerboard"]
