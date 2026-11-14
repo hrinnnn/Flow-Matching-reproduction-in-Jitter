@@ -6,6 +6,7 @@ from jfm.utils.model_wrapper import (
     ModelWrapper,
     ScoreToVelocityWrapper,
 )
+from jfm.utils.schedule import linear_warmup_decay
 from jfm.utils.seed import set_seed
 from jfm.utils.tensor_utils import (
     expand_tensor_like,
@@ -22,6 +23,7 @@ __all__ = [
     "expand_tensor_like",
     "gaussian_log_prob",
     "gradient",
+    "linear_warmup_decay",
     "set_seed",
     "unsqueeze_to_match",
 ]

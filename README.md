@@ -2,6 +2,19 @@
 
 清华大学《人工神经网络》课程大作业开源仓库：使用 **Jittor** 框架完整复现 Lipman et al. (ICLR 2023) [*Flow Matching for Generative Modeling*](https://arxiv.org/abs/2210.02747)，并系统完成采样效率分析、精确似然（BPD）估计、扩散基线对比与条件/最优传输扩展实验。
 
+仓库：<https://github.com/hrinnnn/Flow-Matching-reproduction-in-Jitter>
+
+```bash
+pip install -r requirements.txt
+python scripts/run_2d_checkerboard.py --iterations 1500 --batch_size 1024 --output_dir outputs/2d_preview
+python scripts/train_cifar10.py --config configs/cifar10_smoke.yaml --fake-data
+python scripts/train_cifar10.py --config configs/cifar10_paper.yaml --method fm_ot --use-cuda
+python scripts/train_cifar10.py --config configs/cifar10_paper.yaml --method fm_dif --use-cuda
+python scripts/eval_cifar10.py --config configs/cifar10_paper.yaml --checkpoint outputs/cifar10/fm_ot/ema.pkl --ema --use-cuda
+```
+
+`cifar10_paper` 用论文附录 E 表 3 的 U-Net。`cifar10_cfg` 在同一结构上加 10 类条件和 classifier-free guidance。官方库 `examples/image` 里的 CIFAR 默认配置更小，对应预设名 `cifar10_repo`，不用于表 1。
+
 ---
 
 ## 1. 任务范围对齐（课程要求全覆盖）

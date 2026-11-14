@@ -1,0 +1,35 @@
+# Class-conditional CIFAR-10 with classifier-free guidance.
+# Same U-Net as the paper preset, plus 10 class embeddings and one null token.
+seed: 0
+method: fm_ot
+model:
+  preset: cifar10_paper
+  num_classes: 10
+path:
+  sigma_min: 0.0
+  beta_min: 0.1
+  beta_max: 20.0
+  time_eps: 1.0e-5
+train:
+  iterations: 391000
+  batch_size: 128
+  accum_steps: 2
+  lr: 5.0e-4
+  min_lr: 1.0e-8
+  warmup_steps: 45000
+  class_drop_prob: 0.1
+  ema_decay: 0.9999
+  log_every: 100
+  ckpt_every: 5000
+data:
+  root: data/cifar10
+  download: true
+  random_flip: true
+  num_workers: 4
+eval:
+  num_samples: 50000
+  batch_size: 64
+  solver: dopri5
+  atol: 1.0e-5
+  rtol: 1.0e-5
+  cfg_scale: 1.0
