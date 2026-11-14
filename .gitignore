@@ -1,0 +1,49 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Jittor cache & compiled kernels
+.cache/
+jittor_cache/
+
+# Datasets, checkpoints, experiment outputs
+/data/
+/datasets/
+/checkpoints/
+/outputs/
+/results/
+/logs/
+/wandb/
+*.jt
+*.pkl
+*.pth
+*.pt
+*.ckpt
+*.npz
+
+# Local reference PDFs / reference PyTorch repo / local deps
+flow matching paper.pdf
+/_ref_flow_matching/
+/.pydeps/
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
