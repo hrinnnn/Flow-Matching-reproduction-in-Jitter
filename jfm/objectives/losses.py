@@ -26,11 +26,19 @@ from jfm.utils.tensor_utils import expand_tensor_like
 
 
 class CFMLoss(nn.Module):
-    """Conditional Flow Matching L2 loss E[ || v_theta(x_t, t) - dx_t ||^2 ] (Eq. 9, 14)."""
+    """Conditional Flow Matching L2 loss E[ || v_theta(x_t, t) - dx_t ||^2 ] (Eq. 9, 14).
 
-    def __init__(self, path: AffineProbPath):
+    ``coupling="independent"`` draws ``x_0`` independently of ``x_1``, which is the
+    conditional path in Lipman et al. ``coupling="minibatch"`` replaces that product
+    coupling by an exact minibatch optimal-transport matching (Tong et al., 2024).
+    """
+
+    def __init__(self, path: AffineProbPath, coupling: str = "independent"):
         super().__init__()
+        if coupling not in ("independent", "minibatch"):
+            raise ValueError(f"coupling must be 'independent' or 'minibatch', got {coupling!r}.")
         self.path = path
+        self.coupling = coupling
 
     def execute(
         self,
@@ -42,6 +50,10 @@ class CFMLoss(nn.Module):
     ) -> jt.Var:
         if x_0 is None:
             x_0 = jt.randn_like(x_1)
+        if self.coupling == "minibatch":
+            from jfm.paths.minibatch_ot import couple_jittor
+
+            x_0 = couple_jittor(x_0, x_1)
         if t is None:
             t = self.path.sample_time(x_1.shape[0], dtype=x_1.dtype)
         sample = self.path.sample(x_0=x_0, x_1=x_1, t=t)
@@ -143,6 +155,7 @@ def build_objective(
     beta_max: float = 20.0,
     time_eps: float = 1e-5,
     cfg_scale: Optional[float] = None,
+    coupling: str = "independent",
 ) -> ObjectiveBundle:
     """Construct a complete training + ODE-sampling bundle for a named method.
 
@@ -162,7 +175,7 @@ def build_objective(
 
     if method_key == "fm_ot":
         path = CondOTProbPath(sigma_min=sigma_min)
-        loss_fn = CFMLoss(path)
+        loss_fn = CFMLoss(path, coupling=coupling)
         return ObjectiveBundle(
             method=method_key,
             path=path,
@@ -182,7 +195,7 @@ def build_objective(
         return ObjectiveBundle(
             method=method_key,
             path=vp_path,
-            loss_fn=CFMLoss(vp_path),
+            loss_fn=CFMLoss(vp_path, coupling=coupling),
             sample_t_end=t_end,
             wrap_velocity=lambda m: (
                 CFGScaledModel(m, cfg_scale=cfg_scale)

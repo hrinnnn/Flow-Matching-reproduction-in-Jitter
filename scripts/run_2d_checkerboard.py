@@ -98,6 +98,7 @@ def train_single_method(method: str, cfg: Dict, out_dir: Path) -> ToyMLP:
         beta_min=cfg["path"]["beta_min"],
         beta_max=cfg["path"]["beta_max"],
         time_eps=cfg["path"]["time_eps"],
+        coupling=cfg["path"].get("coupling", "independent"),
     )
 
     ckpt_path = out_dir / "checkpoints" / f"{method}_mlp.pkl"
@@ -193,6 +194,7 @@ def evaluate_and_plot_figure4(
             beta_min=cfg["path"]["beta_min"],
             beta_max=cfg["path"]["beta_max"],
             time_eps=cfg["path"]["time_eps"],
+            coupling=cfg["path"].get("coupling", "independent"),
         )
         vel_wrapper = bundle.wrap_velocity(model)
         solver = ODESolver(velocity_model=vel_wrapper)
@@ -296,6 +298,7 @@ def evaluate_2d_solver_efficiency(
             beta_min=cfg["path"]["beta_min"],
             beta_max=cfg["path"]["beta_max"],
             time_eps=cfg["path"]["time_eps"],
+            coupling=cfg["path"].get("coupling", "independent"),
         )
         solver = ODESolver(bundle.wrap_velocity(model))
         t_end = bundle.sample_t_end

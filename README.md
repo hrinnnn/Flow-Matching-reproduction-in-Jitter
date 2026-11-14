@@ -13,7 +13,18 @@ python scripts/train_cifar10.py --config configs/cifar10_paper.yaml --method fm_
 python scripts/eval_cifar10.py --config configs/cifar10_paper.yaml --checkpoint outputs/cifar10/fm_ot/ema.pkl --ema --use-cuda
 ```
 
-`cifar10_paper` 用论文附录 E 表 3 的 U-Net。`cifar10_cfg` 在同一结构上加 10 类条件和 classifier-free guidance。官方库 `examples/image` 里的 CIFAR 默认配置更小，对应预设名 `cifar10_repo`，不用于表 1。
+`cifar10_paper` 用论文附录 E 表 3 的 U-Net。`cifar10_cfg` 在同一结构上加 10 类条件和 classifier-free guidance。`cifar10_ddpm.yaml`、`cifar10_sm.yaml` 是同一 U-Net 上的扩散基线，`cifar10_minibatch_ot.yaml` 把噪声和数据在 batch 内做最优传输配对。官方库 `examples/image` 里的 CIFAR 默认配置更小，对应预设名 `cifar10_repo`，不用于表 1。
+
+没有 GPU 时也能检查这些不依赖训练权重的部分：
+
+```bash
+python -m pytest tests/test_ot_and_weight_keys.py tests/test_schedule_and_fid.py -q
+python scripts/sweep_solvers.py --analytical
+python scripts/visualize_paths.py --analytical
+python scripts/profile_runtime.py --steps 3
+```
+
+`jittor_ode/` 是独立的 Jittor ODE 求解包，说明见 [jittor_ode/README.md](jittor_ode/README.md)。PyTorch 权重转换是 `tools/convert_checkpoint.py`。预训练权重要等 GPU 训练结束后再放进仓库。
 
 ---
 

@@ -99,6 +99,7 @@ def main() -> None:
         beta_min=cfg["path"]["beta_min"],
         beta_max=cfg["path"]["beta_max"],
         time_eps=cfg["path"]["time_eps"],
+        coupling=cfg["path"].get("coupling", "independent"),
     )
     train_cfg = cfg["train"]
     optimizer = jt.optim.Adam(
