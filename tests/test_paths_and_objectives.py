@@ -33,18 +33,22 @@ def test_schedulers_finite_difference_derivatives():
         CosineScheduler(),
     ]
     t_np = np.linspace(0.08, 0.92, 17, dtype=np.float64)
-    eps = 1e-6
+    # Jittor stores these schedules in float32. A 1e-6 step is lost to rounding.
+    eps = 1e-3
+
+    def as_time(values):
+        return jt.array(np.asarray(values, dtype=np.float32))
 
     for sched in schedulers:
-        out = sched(jt.array(t_np))
-        out_plus = sched(jt.array(t_np + eps))
-        out_minus = sched(jt.array(t_np - eps))
+        out = sched(as_time(t_np))
+        out_plus = sched(as_time(t_np + eps))
+        out_minus = sched(as_time(t_np - eps))
 
         fd_alpha = (out_plus.alpha_t.numpy() - out_minus.alpha_t.numpy()) / (2.0 * eps)
         fd_sigma = (out_plus.sigma_t.numpy() - out_minus.sigma_t.numpy()) / (2.0 * eps)
 
-        np.testing.assert_allclose(out.d_alpha_t.numpy(), fd_alpha, rtol=1e-4, atol=1e-4)
-        np.testing.assert_allclose(out.d_sigma_t.numpy(), fd_sigma, rtol=1e-4, atol=1e-4)
+        np.testing.assert_allclose(out.d_alpha_t.numpy(), fd_alpha, rtol=2e-3, atol=2e-3)
+        np.testing.assert_allclose(out.d_sigma_t.numpy(), fd_sigma, rtol=2e-3, atol=2e-3)
 
         # Verify SNR inverse round-trip
         snr = out.alpha_t / out.sigma_t
