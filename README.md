@@ -24,7 +24,7 @@ python scripts/visualize_paths.py --analytical
 python scripts/profile_runtime.py --steps 3
 ```
 
-`jittor_ode/` 是独立的 Jittor ODE 求解包，说明见 [jittor_ode/README.md](jittor_ode/README.md)。PyTorch 权重转换是 `tools/convert_checkpoint.py`。预训练权重要等 GPU 训练结束后再放进仓库。
+`jittor_ode/` 是独立的 Jittor ODE 求解包，说明见 [jittor_ode/README.md](jittor_ode/README.md)。它补上 Jittor-NODE 没有的自适应 `dopri5` 和连续伴随 `odeint_adjoint`。U-Net 的 GroupNorm 用两遍方差，避开 Jittor 内置实现在大激活上和 PyTorch 对不齐的问题。`python benchmarks/compare_frameworks.py` 会把 GroupNorm 和 dopri5 对上 NumPy / SciPy，装了 PyTorch 或 torchdiffeq 时一并写进对照表。PyTorch 权重转换是 `tools/convert_checkpoint.py`。预训练权重要等 GPU 训练结束后再放进仓库。
 
 ---
 

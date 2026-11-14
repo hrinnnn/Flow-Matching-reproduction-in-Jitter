@@ -1,0 +1,17 @@
+{
+  "group_norm": {
+    "groupnorm32_vs_numpy_two_pass_max_abs": 1.5974044799804688e-05,
+    "groupnorm32_vs_pytorch_max_abs": 1.7404556274414062e-05
+  },
+  "ode": {
+    "analytical_y1": 0.36787944117144233,
+    "scipy_rk45_abs_error": 2.2926347888474474e-06,
+    "scipy_rk45_nfe": 26,
+    "jittor_dopri5_abs_error": 2.9893819939452726e-06,
+    "jittor_dopri5_value": 0.3678824305534363,
+    "jittor_rk4_100_steps_abs_error": 1.581613671142179e-07,
+    "pytorch_rk4_100_steps_abs_error": 1.581613671142179e-07,
+    "jittor_minus_pytorch_rk4": 0.0,
+    "torchdiffeq": "unavailable: No module named 'torchdiffeq'"
+  }
+}

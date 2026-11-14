@@ -91,13 +91,51 @@ def zero_module(module: nn.Module) -> nn.Module:
     return module
 
 
-def normalization(channels: int) -> nn.GroupNorm:
-    """GroupNorm with 32 groups, matching guided-diffusion ``GroupNorm32``."""
+class GroupNorm32(nn.Module):
+    """GroupNorm whose variance matches PyTorch.
+
+    ``jittor.nn.GroupNorm`` uses ``E[x^2] - E[x]^2``. That is the population
+    variance in exact arithmetic, but it cancels when the activations are large,
+    so a U-Net loaded from PyTorch drifts. PyTorch uses the two-pass biased
+    estimator ``E[(x - E[x])^2]`` (``correction=0``). Ports such as Point2RBox-v3
+    had to replace Jittor's formula for the same reason.
+    """
+
+    def __init__(self, num_groups: int, num_channels: int, eps: float = 1e-5):
+        super().__init__()
+        if num_channels % num_groups != 0:
+            raise ValueError(f"{num_channels} channels is not divisible by {num_groups} groups.")
+        self.num_groups = int(num_groups)
+        self.num_channels = int(num_channels)
+        self.eps = float(eps)
+        self.weight = jt.ones((num_channels,))
+        self.bias = jt.zeros((num_channels,))
+
+    def execute(self, x: jt.Var) -> jt.Var:
+        n, channels = x.shape[0], x.shape[1]
+        per_group = channels // self.num_groups
+        spatial = 1
+        for size in x.shape[2:]:
+            spatial *= int(size)
+        # Reduce one axis of a 3D view. A 4D reduction of the same numbers
+        # aborts the g++-14 CPU kernel on some Macs.
+        grouped = x.reshape(n, self.num_groups, per_group * spatial)
+        mean = grouped.mean(dims=[2]).reshape(n, self.num_groups, 1)
+        centered = grouped - mean
+        var = (centered * centered).mean(dims=[2]).reshape(n, self.num_groups, 1)
+        normed = ((centered / jt.sqrt(var + self.eps))).reshape(x.shape)
+        scale = self.weight.reshape(1, channels, *([1] * (x.ndim - 2)))
+        shift = self.bias.reshape(1, channels, *([1] * (x.ndim - 2)))
+        return normed * scale + shift
+
+
+def normalization(channels: int) -> GroupNorm32:
+    """32-group GroupNorm used by the ADM U-Net, with PyTorch's variance."""
     if channels % 32 != 0:
         raise ValueError(
             f"ADM GroupNorm expects channels divisible by 32, got {channels}."
         )
-    return nn.GroupNorm(32, channels)
+    return GroupNorm32(32, channels)
 
 
 def timestep_embedding(timesteps: jt.Var, dim: int, max_period: int = 10000) -> jt.Var:

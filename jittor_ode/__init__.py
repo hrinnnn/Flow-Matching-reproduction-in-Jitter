@@ -18,11 +18,11 @@ Example::
     print(solver.last_nfe)
 """
 
+from jittor_ode.adjoint import odeint_adjoint
+from jittor_ode.compat import odeint
 from jittor_ode.hutchinson import hutchinson_divergence, rademacher_like
 from jittor_ode.solver import ODESolver, SUPPORTED_SOLVERS, odeint_jittor
 from jittor_ode.tensor_utils import gaussian_log_prob, gradient
-
-odeint = odeint_jittor
 
 __all__ = [
     "ODESolver",
@@ -31,6 +31,7 @@ __all__ = [
     "gradient",
     "hutchinson_divergence",
     "odeint",
+    "odeint_adjoint",
     "odeint_jittor",
     "rademacher_like",
 ]

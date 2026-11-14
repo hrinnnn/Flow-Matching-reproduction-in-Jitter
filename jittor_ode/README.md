@@ -8,6 +8,8 @@ Jittor 上的神经网络常微分方程求解包。Jittor 没有 `torchdiffeq` 
 - 自适应 `dopri5`：Dormand–Prince 5(4)，下一步复用上一步最后一次函数值（FSAL），按容差接受或拒绝步长。
 - `ODESolver.last_nfe`：一次采样实际调用速度场的次数。
 - `hutchinson_divergence`：用一次 `jt.grad` 估计向量场散度，探针默认是 Rademacher 向量。
+- `odeint`：和 `torchdiffeq.odeint` 相同的调用方式，`func(t, y)`，支持 `dopri5`。2025 年的 Jittor-NODE 只有定步长 `euler` 和 `rk4`。
+- `odeint_adjoint`：反向时解伴随方程，不保存每个 RK 阶段的计算图，对应 `torchdiffeq.odeint_adjoint`。
 
 ## 用法
 
